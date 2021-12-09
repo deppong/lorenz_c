@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include <SDL.h>
+#include <math.h>
 
-#define WIDTH 1920
-#define HEIGHT 1080
-#define P_COUNT 10
+#define WIDTH 800
+#define HEIGHT 800
+#define P_COUNT 3000
 
 typedef struct particle {
     double x, y, z;
     int    r, g, b;
 }particle;
+
+particle rotateByMatrix(int *mat4[], particle p) {
+    
+}
 
 int main(int argc, int* argv[]) {
     int quit = 0;
@@ -25,7 +30,6 @@ int main(int argc, int* argv[]) {
         particles[i].g = 45 * i + 45;
         particles[i].b = 200 * i + 50;
     }
-
 
     // SDL initialization
     SDL_Init(SDL_INIT_VIDEO);
@@ -44,7 +48,11 @@ int main(int argc, int* argv[]) {
     double beta  = 8.0/3.0;  
     double dt = 0.01;
 
-    int step = 1, scale = 20;
+    float theta = 0;
+
+    int step = 1, scale = 10;
+
+    int last_time = SDL_GetTicks();
 
     while(!quit) {
         
@@ -71,6 +79,9 @@ int main(int argc, int* argv[]) {
                             particles[i].z = 0;
                         }
                         break;
+
+                    case SDLK_RIGHT: theta+=10;break;
+                    case SDLK_LEFT: theta -=10;break;
                 }
         }
 
@@ -85,12 +96,30 @@ int main(int argc, int* argv[]) {
                 particles[i].y += dy;
                 particles[i].z += dz;
 
-                // render each particle with it's own rgb value at it's x and y value, in the middle of the renderer
-                SDL_SetRenderDrawColor(renderer, particles[i].r, particles[i].g, particles[i].b, 255);
-                SDL_RenderDrawPoint(renderer, particles[i].x*scale + WIDTH/2, particles[i].y*scale + HEIGHT/2);
-                SDL_RenderPresent(renderer);
+                // particles[i].x = cos(theta) * particles[i].x + sin(theta) * particles[i].z;
+                // particles[i].z = -sin(theta) * particles[i].x + cos(theta) * particles[i].z;
             }
+
         }
+
+        SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
+        SDL_RenderClear(renderer);
+
+        for (int i = 0; i < P_COUNT; i++) {
+
+            // render each particle with it's own rgb value at it's x and y value, in the middle of the renderer
+            SDL_SetRenderDrawColor(renderer, particles[i].r, particles[i].g, particles[i].b, 255);
+            SDL_RenderDrawPointF(renderer, particles[i].x*scale + WIDTH/2, particles[i].y*scale + HEIGHT/2);
+        } 
+
+
+        SDL_RenderPresent(renderer);
+
+        if (SDL_GetTicks() - last_time < 1000 * dt) {
+            SDL_Delay(1000 * dt - (SDL_GetTicks() - last_time));
+            last_time = SDL_GetTicks();
+        }
+
     }
 
     // free memory allocated
