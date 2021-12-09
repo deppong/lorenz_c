@@ -42,7 +42,7 @@ int main(int argc, int* argv[]) {
     double rho   = 28.0;
     double sigma = 10.0;
     double beta  = 8.0/3.0;  
-    double dt = 0.005;
+    double dt = 0.01;
 
     int step = 1, scale = 20;
 
